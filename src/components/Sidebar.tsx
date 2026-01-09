@@ -41,18 +41,22 @@ const Sidebar: React.FC = () => {
                     { label: 'Job Matches', path: '/user/jobs', icon: <Briefcase size={20} />, badge: 5 },
                     { label: 'Applications', path: '/user/applications', icon: <FileText size={20} />, badge: 3 },
                     { label: 'ATS Score', path: '/user/ats-score', icon: <BarChart3 size={20} /> },
+                    { label: 'Settings', path: '/user/settings', icon: <Settings size={20} /> },
                 ];
             case 'recruiter':
                 return [
                     { label: 'Dashboard', path: '/recruiter/dashboard', icon: <LayoutDashboard size={20} /> },
+                    { label: 'My Profile', path: '/recruiter/profile', icon: <User size={20} /> },
                     { label: 'Post a Job', path: '/recruiter/post-job', icon: <PlusCircle size={20} /> },
                     { label: 'AI Matching', path: '/recruiter/candidates', icon: <Sparkles size={20} />, badge: 12 },
                     { label: 'My Jobs', path: '/recruiter/jobs', icon: <Briefcase size={20} /> },
                     { label: 'Applicants', path: '/recruiter/applicants', icon: <Users size={20} />, badge: 8 },
+                    { label: 'Settings', path: '/recruiter/settings', icon: <Settings size={20} /> },
                 ];
             case 'admin':
                 return [
                     { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={20} /> },
+                    { label: 'My Profile', path: '/admin/profile', icon: <User size={20} /> },
                     { label: 'User Management', path: '/admin/users', icon: <Users size={20} /> },
                     { label: 'Job Moderation', path: '/admin/jobs', icon: <Shield size={20} />, badge: 5 },
                     { label: 'Analytics', path: '/admin/analytics', icon: <BarChart3 size={20} /> },

@@ -16,15 +16,24 @@ import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 
-// Dashboard Pages
+// User Dashboard Pages
 import UserDashboard from './pages/user/UserDashboard';
+import ProfilePage from './pages/user/ProfilePage';
+import JobMatchesPage from './pages/user/JobMatchesPage';
+import ApplicationsPage from './pages/user/ApplicationsPage';
+import SettingsPage from './pages/user/SettingsPage';
+
+// Recruiter Dashboard Pages
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard';
+
+// Admin Dashboard Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 
 // Styles
 import './pages/PagesStyles.css';
+import './pages/user/DashboardPages.css';
 
-// Placeholder pages for additional routes
+// Placeholder for pages not yet implemented
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="dashboard-page">
     <h1 className="dashboard-title">{title}</h1>
@@ -56,10 +65,11 @@ const App: React.FC = () => {
             }>
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<UserDashboard />} />
-              <Route path="profile" element={<PlaceholderPage title="My Profile" />} />
-              <Route path="jobs" element={<PlaceholderPage title="Job Matches" />} />
-              <Route path="applications" element={<PlaceholderPage title="My Applications" />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="jobs" element={<JobMatchesPage />} />
+              <Route path="applications" element={<ApplicationsPage />} />
               <Route path="ats-score" element={<PlaceholderPage title="ATS Score Analysis" />} />
+              <Route path="settings" element={<SettingsPage />} />
             </Route>
 
             {/* Recruiter Routes */}
@@ -70,10 +80,12 @@ const App: React.FC = () => {
             }>
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<RecruiterDashboard />} />
+              <Route path="profile" element={<ProfilePage />} />
               <Route path="post-job" element={<PlaceholderPage title="Post a New Job" />} />
               <Route path="candidates" element={<PlaceholderPage title="AI-Matched Candidates" />} />
               <Route path="jobs" element={<PlaceholderPage title="My Job Postings" />} />
-              <Route path="applicants" element={<PlaceholderPage title="All Applicants" />} />
+              <Route path="applicants" element={<ApplicationsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
             </Route>
 
             {/* Admin Routes */}
@@ -84,10 +96,11 @@ const App: React.FC = () => {
             }>
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="profile" element={<ProfilePage />} />
               <Route path="users" element={<PlaceholderPage title="User Management" />} />
               <Route path="jobs" element={<PlaceholderPage title="Job Moderation" />} />
               <Route path="analytics" element={<PlaceholderPage title="Platform Analytics" />} />
-              <Route path="settings" element={<PlaceholderPage title="System Settings" />} />
+              <Route path="settings" element={<SettingsPage />} />
             </Route>
 
             {/* Fallback */}
@@ -100,3 +113,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
