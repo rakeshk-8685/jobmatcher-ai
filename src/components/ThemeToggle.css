@@ -1,0 +1,53 @@
+/* Theme Toggle Styles */
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.theme-toggle-buttons {
+    display: flex;
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 3px;
+    gap: 2px;
+}
+
+.theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+    color: var(--color-text-secondary);
+    background: var(--color-surface-hover);
+}
+
+.theme-toggle-btn.active {
+    color: var(--color-primary-light);
+    background: var(--color-primary-glow);
+}
+
+.theme-toggle-label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Compact version for navbar */
+.theme-toggle-compact .theme-toggle-buttons {
+    padding: 2px;
+}
+
+.theme-toggle-compact .theme-toggle-btn {
+    padding: var(--spacing-1);
+}

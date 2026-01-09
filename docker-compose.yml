@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: jobmatcher-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=jobmatcher
+    networks:
+      - jobmatcher-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: jobmatcher-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/jobmatcher
+      - JWT_SECRET=docker-dev-secret-change-in-production
+      - JWT_EXPIRES_IN=15m
+      - JWT_REFRESH_SECRET=docker-refresh-secret-change-in-production
+      - JWT_REFRESH_EXPIRES_IN=7d
+      - FRONTEND_URL=http://localhost:5173
+      - AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - jobmatcher-network
+    volumes:
+      - ./backend/uploads:/app/uploads
+
+  # AI Service (Python FastAPI)
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: jobmatcher-ai
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - jobmatcher-network
+
+  # Frontend (Development - use nginx for production)
+  frontend:
+    build:
+      context: ./
+      dockerfile: Dockerfile.frontend
+    container_name: jobmatcher-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+      - VITE_AI_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - jobmatcher-network
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+
+networks:
+  jobmatcher-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
