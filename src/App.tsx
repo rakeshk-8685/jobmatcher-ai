@@ -22,9 +22,15 @@ import ProfilePage from './pages/user/ProfilePage';
 import JobMatchesPage from './pages/user/JobMatchesPage';
 import ApplicationsPage from './pages/user/ApplicationsPage';
 import SettingsPage from './pages/user/SettingsPage';
+import ATSScorePage from './pages/user/ATSScorePage';
 
 // Recruiter Dashboard Pages
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard';
+import RecruiterATSPage from './pages/recruiter/RecruiterATSPage';
+import BulkATSAnalyzer from './pages/recruiter/BulkATSAnalyzer';
+import PostJobPage from './pages/recruiter/PostJobPage';
+import AIMatchingPage from './pages/recruiter/AIMatchingPage';
+import MyJobsPage from './pages/recruiter/MyJobsPage';
 
 // Admin Dashboard Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -68,7 +74,7 @@ const App: React.FC = () => {
               <Route path="profile" element={<ProfilePage />} />
               <Route path="jobs" element={<JobMatchesPage />} />
               <Route path="applications" element={<ApplicationsPage />} />
-              <Route path="ats-score" element={<PlaceholderPage title="ATS Score Analysis" />} />
+              <Route path="ats-score" element={<ATSScorePage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
 
@@ -81,10 +87,12 @@ const App: React.FC = () => {
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<RecruiterDashboard />} />
               <Route path="profile" element={<ProfilePage />} />
-              <Route path="post-job" element={<PlaceholderPage title="Post a New Job" />} />
-              <Route path="candidates" element={<PlaceholderPage title="AI-Matched Candidates" />} />
-              <Route path="jobs" element={<PlaceholderPage title="My Job Postings" />} />
+              <Route path="post-job" element={<PostJobPage />} />
+              <Route path="candidates" element={<AIMatchingPage />} />
+              <Route path="jobs" element={<MyJobsPage />} />
               <Route path="applicants" element={<ApplicationsPage />} />
+              <Route path="ats-analyzer" element={<RecruiterATSPage />} />
+              <Route path="bulk-ats-analyzer" element={<BulkATSAnalyzer />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
 

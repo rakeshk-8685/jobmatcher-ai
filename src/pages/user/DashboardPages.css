@@ -8,6 +8,18 @@
 .profile-card {
     grid-row: span 2;
     text-align: center;
+    position: relative;
+}
+
+.profile-card-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--spacing-2);
+}
+
+.btn-edit-profile {
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
 }
 
 .profile-header {
@@ -101,6 +113,51 @@
 .social-link:hover {
     background: var(--color-primary-glow);
     color: var(--color-primary);
+}
+
+/* Social Edit Mode */
+.social-edit-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    width: 100%;
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--color-border);
+}
+
+.social-edit-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    text-align: left;
+}
+
+.social-edit-item svg {
+    flex-shrink: 0;
+    padding: 10px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    color: white;
+    box-shadow: 0 3px 10px rgba(99, 102, 241, 0.35);
+    transition: all var(--transition-fast);
+}
+
+.social-edit-item:hover svg {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.5);
+}
+
+.social-edit-item .input {
+    flex: 1;
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--radius-lg);
+}
+
+.profile-social {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .card-title {

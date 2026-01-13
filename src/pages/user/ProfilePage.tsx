@@ -4,7 +4,6 @@
 
 import React, { useState } from 'react';
 import {
-    User,
     Mail,
     Phone,
     MapPin,
@@ -51,17 +50,19 @@ const ProfilePage: React.FC = () => {
                     <h1 className="dashboard-title">My Profile</h1>
                     <p className="dashboard-subtitle">Manage your personal information and preferences</p>
                 </div>
-                <button
-                    className={`btn ${isEditing ? 'btn-primary' : 'btn-secondary'}`}
-                    onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                >
-                    {isEditing ? <><Save size={18} /> Save Changes</> : <><Edit2 size={18} /> Edit Profile</>}
-                </button>
             </div>
 
             <div className="profile-grid">
                 {/* Profile Card */}
                 <div className="card profile-card">
+                    <div className="profile-card-header">
+                        <button
+                            className={`btn ${isEditing ? 'btn-primary' : 'btn-secondary'} btn-edit-profile`}
+                            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                        >
+                            {isEditing ? <><Save size={16} /> Save</> : <><Edit2 size={16} /> Edit</>}
+                        </button>
+                    </div>
                     <div className="profile-header">
                         <div className="profile-avatar-large">
                             {user?.name?.charAt(0).toUpperCase() || 'U'}
@@ -131,9 +132,46 @@ const ProfilePage: React.FC = () => {
                     </div>
 
                     <div className="profile-social">
-                        <a href="#" className="social-link"><Linkedin size={18} /></a>
-                        <a href="#" className="social-link"><Github size={18} /></a>
-                        <a href="#" className="social-link"><Globe size={18} /></a>
+                        {isEditing ? (
+                            <div className="social-edit-list">
+                                <div className="social-edit-item">
+                                    <Linkedin size={16} />
+                                    <input
+                                        type="text"
+                                        className="input input-sm"
+                                        placeholder="LinkedIn URL"
+                                        value={formData.linkedIn}
+                                        onChange={(e) => setFormData({ ...formData, linkedIn: e.target.value })}
+                                    />
+                                </div>
+                                <div className="social-edit-item">
+                                    <Github size={16} />
+                                    <input
+                                        type="text"
+                                        className="input input-sm"
+                                        placeholder="GitHub URL"
+                                        value={formData.github}
+                                        onChange={(e) => setFormData({ ...formData, github: e.target.value })}
+                                    />
+                                </div>
+                                <div className="social-edit-item">
+                                    <Globe size={16} />
+                                    <input
+                                        type="text"
+                                        className="input input-sm"
+                                        placeholder="Portfolio URL"
+                                        value={formData.portfolio}
+                                        onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <a href={`https://${formData.linkedIn}`} target="_blank" rel="noopener noreferrer" className="social-link" title={formData.linkedIn}><Linkedin size={18} /></a>
+                                <a href={`https://${formData.github}`} target="_blank" rel="noopener noreferrer" className="social-link" title={formData.github}><Github size={18} /></a>
+                                <a href={`https://${formData.portfolio}`} target="_blank" rel="noopener noreferrer" className="social-link" title={formData.portfolio}><Globe size={18} /></a>
+                            </>
+                        )}
                     </div>
                 </div>
 

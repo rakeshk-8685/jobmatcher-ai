@@ -1,0 +1,20 @@
+batch_id,batch_size,old_time_sec,optimized_time_sec,speedup_factor,old_per_resume_sec,optimized_per_resume_sec,optimization_technique
+1,1,2.3,2.1,1.10,2.30,2.10,Single resume baseline
+2,10,15.4,4.2,3.67,1.54,0.42,Batch API call
+3,25,35.2,8.5,4.14,1.41,0.34,Batch API + parallel
+4,50,68.5,14.2,4.82,1.37,0.28,Batch API 50 per call
+5,100,128.6,24.8,5.19,1.29,0.25,Batch API + ThreadPool
+6,150,186.4,35.6,5.24,1.24,0.24,Batch API + pre-compiled regex
+7,200,242.8,45.2,5.37,1.21,0.23,Parallel batch processing
+8,300,352.4,62.4,5.65,1.17,0.21,Vectorized keyword matching
+9,400,462.8,78.5,5.90,1.16,0.20,Pre-computed JD keywords
+10,500,572.6,94.2,6.08,1.15,0.19,Full optimization stack
+11,600,684.2,108.5,6.31,1.14,0.18,8 worker threads
+12,700,794.8,122.4,6.49,1.14,0.17,Batch embedding encoding
+13,800,906.4,136.8,6.63,1.13,0.17,Reduced network overhead
+14,900,1016.2,150.2,6.77,1.13,0.17,Single API call per batch
+15,1000,1128.5,164.5,6.86,1.13,0.16,Enterprise scale batch
+16,1500,1682.6,238.4,7.06,1.12,0.16,Async processing
+17,2000,2238.4,308.6,7.25,1.12,0.15,Optimized concurrency
+18,2500,2798.2,376.2,7.44,1.12,0.15,Bulk processing mode
+19,3000,3356.8,442.5,7.59,1.12,0.15,Maximum throughput

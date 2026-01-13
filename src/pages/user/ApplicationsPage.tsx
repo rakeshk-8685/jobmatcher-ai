@@ -60,28 +60,28 @@ const ApplicationsPage: React.FC = () => {
                     <div className="stat-icon-box"><FileText size={20} /></div>
                     <div className="stat-content">
                         <span className="stat-value">{applicationStats.total}</span>
-                        <span className="stat-label">Total Applications</span>
+                        <span className="stat-label">  Total Applications</span>
                     </div>
                 </div>
                 <div className="stat-card-box">
                     <div className="stat-icon-box warning"><Clock size={20} /></div>
                     <div className="stat-content">
                         <span className="stat-value">{applicationStats.pending}</span>
-                        <span className="stat-label">Pending</span>
+                        <span className="stat-label"> Pending</span>
                     </div>
                 </div>
                 <div className="stat-card-box">
                     <div className="stat-icon-box info"><Eye size={20} /></div>
                     <div className="stat-content">
                         <span className="stat-value">{applicationStats.reviewing}</span>
-                        <span className="stat-label">Under Review</span>
+                        <span className="stat-label">  Under Review</span>
                     </div>
                 </div>
                 <div className="stat-card-box">
                     <div className="stat-icon-box primary"><Calendar size={20} /></div>
                     <div className="stat-content">
                         <span className="stat-value">{applicationStats.interview}</span>
-                        <span className="stat-label">Interviews</span>
+                        <span className="stat-label">  Interviews</span>
                     </div>
                 </div>
             </div>

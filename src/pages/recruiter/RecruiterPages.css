@@ -1,0 +1,769 @@
+/* ============================================
+   Recruiter Pages Styles
+   Post Job, AI Matching, My Jobs
+   ============================================ */
+
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.page-header-content {
+    flex: 1;
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+}
+
+.page-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Stats Grid */
+.stats-grid.four-col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .stats-grid.four-col {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Filters Card */
+.filters-card {
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+}
+
+.filters-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 180px;
+}
+
+.filter-group.grow {
+    flex: 1;
+}
+
+.filter-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* ============================================
+   Post Job Page
+   ============================================ */
+
+.job-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-section {
+    padding: 1.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.salary-inputs {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.salary-inputs .form-group {
+    flex: 1;
+}
+
+.salary-divider {
+    padding-bottom: 0.75rem;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+}
+
+/* Requirements List */
+.requirements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.requirement-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.requirement-number {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.requirement-item .form-input {
+    flex: 1;
+}
+
+.btn-remove {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-remove:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Skills Section */
+.skills-input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.skill-input-row {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.skill-input-row .form-input {
+    flex: 1;
+}
+
+.skill-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.suggestions-label {
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+}
+
+.skill-suggestion-chip {
+    padding: 0.35rem 0.75rem;
+    background: var(--color-surface-secondary);
+    border: 1px dashed var(--color-border);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.skill-suggestion-chip:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.selected-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.skill-chip.selected,
+.skill-chip.benefit {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.skill-chip.selected button,
+.skill-chip.benefit button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    opacity: 0.8;
+    display: flex;
+    padding: 0;
+}
+
+.skill-chip.selected button:hover,
+.skill-chip.benefit button:hover {
+    opacity: 1;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 1rem;
+}
+
+/* Job Preview */
+.job-preview-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.job-preview-card {
+    padding: 2rem;
+}
+
+.job-preview-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.job-preview-header .company-name {
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+}
+
+.job-preview-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 1.5rem;
+}
+
+.job-preview-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.job-preview-section {
+    margin-bottom: 1.5rem;
+}
+
+.job-preview-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--color-text-primary);
+}
+
+.job-preview-section ul {
+    padding-left: 1.5rem;
+    color: var(--color-text-secondary);
+}
+
+.job-preview-section li {
+    margin-bottom: 0.5rem;
+}
+
+.skills-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* ============================================
+   AI Matching Page
+   ============================================ */
+
+.candidates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.candidate-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.candidate-main {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    gap: 1.5rem;
+}
+
+.candidate-main:hover {
+    background: var(--color-surface-secondary);
+}
+
+.candidate-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 250px;
+}
+
+.candidate-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.candidate-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.candidate-role {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.35rem;
+}
+
+.candidate-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+}
+
+.candidate-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.candidate-center {
+    flex: 2;
+}
+
+.candidate-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.skill-chip.small {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.7rem;
+}
+
+.skill-chip.more {
+    background: var(--color-surface-tertiary);
+    color: var(--color-text-tertiary);
+}
+
+.candidate-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.match-score-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.match-score-badge.excellent {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.match-score-badge.good {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+}
+
+.match-score-badge.partial {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.match-score-badge.poor {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.expand-icon {
+    color: var(--color-text-tertiary);
+}
+
+/* Expanded Candidate View */
+.candidate-expanded {
+    background: var(--color-surface-secondary);
+    border-top: 1px solid var(--color-border);
+    padding: 1.5rem;
+}
+
+.expanded-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.expanded-section h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: 0.75rem;
+}
+
+.expanded-section p {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.expanded-section .skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.candidate-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+/* ============================================
+   My Jobs Page
+   ============================================ */
+
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.25rem;
+}
+
+.job-card {
+    padding: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.job-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.job-card.paused {
+    opacity: 0.75;
+}
+
+.job-card.closed {
+    opacity: 0.6;
+}
+
+.job-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.job-card-title h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.job-company {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.job-card-menu {
+    position: relative;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--color-text-tertiary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 0.5rem;
+    min-width: 160px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+}
+
+.dropdown-menu button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.dropdown-menu button:hover {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+}
+
+.dropdown-menu button.danger {
+    color: #ef4444;
+}
+
+.dropdown-menu button.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.job-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+}
+
+.job-card-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.job-card-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+}
+
+.job-card-stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 1rem;
+}
+
+.job-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--color-text-tertiary);
+}
+
+.job-stat .stat-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.job-stat .stat-label {
+    font-size: 0.7rem;
+}
+
+.job-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-badge.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.status-badge.paused {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.status-badge.closed {
+    background: var(--color-surface-tertiary);
+    color: var(--color-text-tertiary);
+}
+
+.status-badge.draft {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-secondary);
+    border: 1px dashed var(--color-border);
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--color-text-tertiary);
+}
+
+.empty-state svg {
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 1.25rem;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+
+    .salary-inputs {
+        flex-direction: column;
+    }
+
+    .salary-divider {
+        text-align: center;
+        padding: 0.5rem 0;
+    }
+
+    .candidate-main {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .candidate-right {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 1rem;
+    }
+
+    .expanded-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .jobs-grid {
+        grid-template-columns: 1fr;
+    }
+}

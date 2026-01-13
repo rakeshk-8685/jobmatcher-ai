@@ -352,7 +352,7 @@ const LandingPage: React.FC = () => {
                     </div>
 
                     <div className="footer-bottom">
-                        <p>&copy; 2025 JobMatcher AI. Created By Rakesh's Father. All rights reserved.</p>
+                        <p>&copy; 2025 JobMatcher AI. All rights reserved.</p>
                     </div>
                 </div>
             </footer>

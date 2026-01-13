@@ -17,6 +17,7 @@ import {
     Shield,
     Search,
     Sparkles,
+    Zap,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import type { UserRole } from '../types';
@@ -51,6 +52,8 @@ const Sidebar: React.FC = () => {
                     { label: 'AI Matching', path: '/recruiter/candidates', icon: <Sparkles size={20} />, badge: 12 },
                     { label: 'My Jobs', path: '/recruiter/jobs', icon: <Briefcase size={20} /> },
                     { label: 'Applicants', path: '/recruiter/applicants', icon: <Users size={20} />, badge: 8 },
+                    { label: 'ATS Analyzer', path: '/recruiter/ats-analyzer', icon: <BarChart3 size={20} /> },
+                    { label: 'Bulk Analyzer', path: '/recruiter/bulk-ats-analyzer', icon: <Zap size={20} /> },
                     { label: 'Settings', path: '/recruiter/settings', icon: <Settings size={20} /> },
                 ];
             case 'admin':

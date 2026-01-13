@@ -5,7 +5,7 @@ FastAPI microservice for ATS scoring and AI matching
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import ats, similarity, resume
+from app.routes import ats, similarity, resume, batch_ats
 
 app = FastAPI(
     title="JobMatcher AI Service",
@@ -32,6 +32,7 @@ async def health_check():
 
 # Include routers
 app.include_router(ats.router, prefix="/ai", tags=["ATS"])
+app.include_router(batch_ats.router, prefix="/ai", tags=["Batch ATS"])
 app.include_router(similarity.router, prefix="/ai", tags=["Similarity"])
 app.include_router(resume.router, prefix="/ai", tags=["Resume"])
 
