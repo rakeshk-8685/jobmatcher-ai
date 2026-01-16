@@ -23,6 +23,7 @@ import JobMatchesPage from './pages/user/JobMatchesPage';
 import ApplicationsPage from './pages/user/ApplicationsPage';
 import SettingsPage from './pages/user/SettingsPage';
 import ATSScorePage from './pages/user/ATSScorePage';
+import NotificationsPage from './pages/user/NotificationsPage';
 
 // Recruiter Dashboard Pages
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard';
@@ -75,6 +76,7 @@ const App: React.FC = () => {
               <Route path="jobs" element={<JobMatchesPage />} />
               <Route path="applications" element={<ApplicationsPage />} />
               <Route path="ats-score" element={<ATSScorePage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
 
@@ -93,6 +95,7 @@ const App: React.FC = () => {
               <Route path="applicants" element={<ApplicationsPage />} />
               <Route path="ats-analyzer" element={<RecruiterATSPage />} />
               <Route path="bulk-ats-analyzer" element={<BulkATSAnalyzer />} />
+              <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
 
@@ -108,6 +111,7 @@ const App: React.FC = () => {
               <Route path="users" element={<PlaceholderPage title="User Management" />} />
               <Route path="jobs" element={<PlaceholderPage title="Job Moderation" />} />
               <Route path="analytics" element={<PlaceholderPage title="Platform Analytics" />} />
+              <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
 

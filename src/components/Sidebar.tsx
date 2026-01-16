@@ -18,6 +18,7 @@ import {
     Search,
     Sparkles,
     Zap,
+    Bell,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import type { UserRole } from '../types';
@@ -42,6 +43,7 @@ const Sidebar: React.FC = () => {
                     { label: 'Job Matches', path: '/user/jobs', icon: <Briefcase size={20} />, badge: 5 },
                     { label: 'Applications', path: '/user/applications', icon: <FileText size={20} />, badge: 3 },
                     { label: 'ATS Score', path: '/user/ats-score', icon: <BarChart3 size={20} /> },
+                    { label: 'Notifications', path: '/user/notifications', icon: <Bell size={20} />, badge: 3 },
                     { label: 'Settings', path: '/user/settings', icon: <Settings size={20} /> },
                 ];
             case 'recruiter':
@@ -54,6 +56,7 @@ const Sidebar: React.FC = () => {
                     { label: 'Applicants', path: '/recruiter/applicants', icon: <Users size={20} />, badge: 8 },
                     { label: 'ATS Analyzer', path: '/recruiter/ats-analyzer', icon: <BarChart3 size={20} /> },
                     { label: 'Bulk Analyzer', path: '/recruiter/bulk-ats-analyzer', icon: <Zap size={20} /> },
+                    { label: 'Notifications', path: '/recruiter/notifications', icon: <Bell size={20} />, badge: 3 },
                     { label: 'Settings', path: '/recruiter/settings', icon: <Settings size={20} /> },
                 ];
             case 'admin':
@@ -63,6 +66,7 @@ const Sidebar: React.FC = () => {
                     { label: 'User Management', path: '/admin/users', icon: <Users size={20} /> },
                     { label: 'Job Moderation', path: '/admin/jobs', icon: <Shield size={20} />, badge: 5 },
                     { label: 'Analytics', path: '/admin/analytics', icon: <BarChart3 size={20} /> },
+                    { label: 'Notifications', path: '/admin/notifications', icon: <Bell size={20} />, badge: 3 },
                     { label: 'Settings', path: '/admin/settings', icon: <Settings size={20} /> },
                 ];
             default:

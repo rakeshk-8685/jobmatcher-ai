@@ -4,6 +4,7 @@
 // ============================================
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Briefcase,
     MapPin,
@@ -30,6 +31,7 @@ import {
 } from 'lucide-react';
 import '../user/DashboardPages.css';
 import './PostJobPage.css';
+import { createJob } from '../../services/jobs';
 
 interface JobFormData {
     title: string;
@@ -45,6 +47,7 @@ interface JobFormData {
 }
 
 const PostJobPage: React.FC = () => {
+    const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState<JobFormData>({
         title: '',
@@ -152,10 +155,39 @@ const PostJobPage: React.FC = () => {
 
     const handleSubmit = async (isDraft: boolean = false) => {
         setIsSubmitting(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        console.log('Submitting job:', { ...formData, isDraft });
-        setIsSubmitting(false);
-        alert(isDraft ? 'Job saved as draft!' : 'Job posted successfully!');
+
+        try {
+            const jobPayload = {
+                title: formData.title,
+                company: formData.company,
+                location: formData.location,
+                type: formData.type,
+                experienceLevel: formData.experience,
+                salary: {
+                    min: parseInt(formData.salary.min) || 0,
+                    max: parseInt(formData.salary.max) || 0,
+                    currency: 'USD',
+                    isVisible: true
+                },
+                description: formData.description,
+                requirements: formData.requirements.filter(r => r.trim()),
+                skills: formData.skills,
+                benefits: formData.benefits,
+                status: isDraft ? 'draft' as const : 'active' as const
+            };
+
+            const result = await createJob(jobPayload);
+
+            if (result) {
+                alert(isDraft ? 'Job saved as draft!' : 'Job posted successfully!');
+                navigate('/recruiter/jobs');
+            }
+        } catch (error) {
+            console.error('Error posting job:', error);
+            alert('Failed to post job. Please make sure the backend server is running.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const canProceed = () => {

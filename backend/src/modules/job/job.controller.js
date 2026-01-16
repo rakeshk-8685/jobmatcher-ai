@@ -78,6 +78,28 @@ exports.getJobs = async (req, res) => {
     }
 };
 
+// @desc    Get recruiter's own jobs
+// @route   GET /api/jobs/my-jobs
+// @access  Private (Recruiter)
+exports.getMyJobs = async (req, res) => {
+    try {
+        const jobs = await Job.find({ recruiter: req.user._id })
+            .sort({ createdAt: -1 });
+
+        res.json({
+            success: true,
+            data: jobs
+        });
+    } catch (error) {
+        console.error('Get my jobs error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching your jobs'
+        });
+    }
+};
+
+
 // @desc    Get single job
 // @route   GET /api/jobs/:id
 // @access  Public
