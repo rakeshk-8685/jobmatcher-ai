@@ -9,7 +9,7 @@ import {
     MapPin,
     Briefcase,
     Clock,
-    DollarSign,
+    IndianRupee,
     Heart,
     ArrowRight,
     TrendingUp
@@ -121,8 +121,8 @@ const JobMatchesPage: React.FC = () => {
                         </div>
 
                         <div className="job-match-salary">
-                            <DollarSign size={16} />
-                            <span>${(job.salary.min / 1000).toFixed(0)}k - ${(job.salary.max / 1000).toFixed(0)}k / year</span>
+                            <IndianRupee size={16} />
+                            <span>₹{(job.salary.min / 100000).toFixed(1)}L - ₹{(job.salary.max / 100000).toFixed(1)}L / year</span>
                         </div>
 
                         <div className="job-match-skills">

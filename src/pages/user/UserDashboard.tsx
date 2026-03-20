@@ -75,7 +75,7 @@ const UserDashboard: React.FC = () => {
                             <p className="job-company">{job.company}</p>
                             <p className="job-location">{job.location}</p>
                             <div className="job-tags">{job.skills.slice(0, 3).map((skill, i) => (<span key={i} className="job-tag">{skill}</span>))}</div>
-                            <div className="job-card-footer"><span className="job-salary">${(job.salary.min / 1000).toFixed(0)}k - ${(job.salary.max / 1000).toFixed(0)}k</span><button className="btn btn-primary btn-sm">Apply</button></div>
+                            <div className="job-card-footer"><span className="job-salary">₹{(job.salary.min / 100000).toFixed(1)}L - ₹{(job.salary.max / 100000).toFixed(1)}L</span><button className="btn btn-primary btn-sm">Apply</button></div>
                         </div>
                     ))}
                 </div>

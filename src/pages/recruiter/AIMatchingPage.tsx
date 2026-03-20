@@ -55,7 +55,7 @@ const AIMatchingPage: React.FC = () => {
         { id: '4', title: 'Product Manager', applicants: 21 }
     ];
 
-    const candidates: Candidate[] = [
+    const mockCandidates: Candidate[] = [
         {
             id: '1', name: 'Sarah Johnson', email: 'sarah.j@email.com', phone: '+1 555-0101',
             role: 'Senior Frontend Developer', location: 'San Francisco, CA', experience: '6 years',
@@ -94,6 +94,20 @@ const AIMatchingPage: React.FC = () => {
         }
     ];
 
+    const [allCandidates, setAllCandidates] = useState<Candidate[]>(mockCandidates);
+
+    React.useEffect(() => {
+        try {
+            const storedStr = localStorage.getItem('jobmatcher_saved_candidates');
+            if (storedStr) {
+                const storedCandidates = JSON.parse(storedStr);
+                setAllCandidates([...storedCandidates, ...mockCandidates]);
+            }
+        } catch (e) {
+            console.error('Failed to load saved candidates from localStorage', e);
+        }
+    }, []);
+
     const getScoreColor = (score: number) => {
         if (score >= 90) return 'excellent';
         if (score >= 75) return 'good';
@@ -112,7 +126,7 @@ const AIMatchingPage: React.FC = () => {
         }
     };
 
-    const filteredCandidates = candidates.filter(c => {
+    const filteredCandidates = allCandidates.filter(c => {
         const matchesJob = selectedJob === 'all' || c.appliedFor === jobs.find(j => j.id === selectedJob)?.title;
         const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             c.skills.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -122,10 +136,10 @@ const AIMatchingPage: React.FC = () => {
     });
 
     const stats = {
-        total: candidates.length,
-        excellent: candidates.filter(c => c.matchScore >= 90).length,
-        good: candidates.filter(c => c.matchScore >= 75 && c.matchScore < 90).length,
-        new: candidates.filter(c => c.status === 'new').length
+        total: allCandidates.length,
+        excellent: allCandidates.filter(c => c.matchScore >= 90).length,
+        good: allCandidates.filter(c => c.matchScore >= 75 && c.matchScore < 90).length,
+        new: allCandidates.filter(c => c.status === 'new').length
     };
 
     return (

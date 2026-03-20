@@ -7,13 +7,13 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import asyncio
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from app.services.ats_scoring import calculate_ats_score, calculate_ats_scores_batch
 
 router = APIRouter()
 
-# Thread pool for CPU-bound operations
-executor = ThreadPoolExecutor(max_workers=8)
+# Process pool for CPU-bound operations bypassing GIL
+executor = ProcessPoolExecutor(max_workers=8)
 
 
 class ResumeItem(BaseModel):
@@ -56,7 +56,8 @@ async def get_batch_ats_scores(request: BatchATSRequest):
             "error": "Maximum 100 resumes per batch. Split into multiple requests."
         }
     
-    # Extract resume texts for batch processing
+    print(f"[AI Service] Incoming batch ATS score request for {len(request.resumes)} resumes")
+    print(f"  - Job Description length: {len(request.job_description)} chars")
     resume_texts = [r.resume_text for r in request.resumes]
     experience_years_list = [r.experience_years or 0 for r in request.resumes]
     education_levels = [r.education_level for r in request.resumes]

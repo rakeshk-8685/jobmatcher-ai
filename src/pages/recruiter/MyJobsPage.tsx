@@ -14,18 +14,17 @@ import {
     Trash2,
     Users,
     TrendingUp,
-    Clock,
     MapPin,
-    DollarSign,
+    IndianRupee,
+    Clock,
     MoreVertical,
     Copy,
     Pause,
     Play,
     CheckCircle,
-    AlertCircle,
-    Loader2
+    AlertCircle
 } from 'lucide-react';
-import { getMyJobs, deleteJob, type JobData } from '../../services/jobs';
+import { getMyJobs, type JobData } from '../../services/jobs';
 import '../user/DashboardPages.css';
 import './RecruiterPages.css';
 
@@ -46,7 +45,6 @@ interface Job {
 
 const MyJobsPage: React.FC = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
-    const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -54,7 +52,6 @@ const MyJobsPage: React.FC = () => {
     // Fetch jobs from API
     useEffect(() => {
         const fetchJobs = async () => {
-            setLoading(true);
             try {
                 const data = await getMyJobs();
                 setJobs(data.map((job: JobData) => ({
@@ -73,8 +70,6 @@ const MyJobsPage: React.FC = () => {
                 })));
             } catch (error) {
                 console.error('Error fetching jobs:', error);
-            } finally {
-                setLoading(false);
             }
         };
         fetchJobs();
@@ -235,7 +230,7 @@ const MyJobsPage: React.FC = () => {
 
                         <div className="job-card-meta">
                             <span><MapPin size={14} /> {job.location}</span>
-                            <span><DollarSign size={14} /> ${job.salary?.min ? (job.salary.min / 1000).toFixed(0) : 0}k - ${job.salary?.max ? (job.salary.max / 1000).toFixed(0) : 0}k</span>
+                            <span><IndianRupee size={14} /> ₹{job.salary?.min ? (job.salary.min / 100000).toFixed(1) : 0}L - ₹{job.salary?.max ? (job.salary.max / 100000).toFixed(1) : 0}L</span>
                             <span><Clock size={14} /> {new Date(job.createdAt).toLocaleDateString()}</span>
                         </div>
 

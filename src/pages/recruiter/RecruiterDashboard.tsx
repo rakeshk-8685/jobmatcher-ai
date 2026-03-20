@@ -7,11 +7,32 @@ import '../user/Dashboard.css';
 
 const RecruiterDashboard: React.FC = () => {
     const myJobs = mockJobs.slice(0, 3);
-    const candidates = [
+    const mockCandidates = [
         { id: '1', name: 'John Doe', role: 'Senior Frontend Dev', match: 95, status: 'new' },
         { id: '2', name: 'Jane Smith', role: 'Full Stack Engineer', match: 88, status: 'reviewed' },
         { id: '3', name: 'Mike Johnson', role: 'React Developer', match: 82, status: 'shortlisted' },
     ];
+
+    const [candidates, setCandidates] = React.useState(mockCandidates);
+
+    React.useEffect(() => {
+        try {
+            const storedStr = localStorage.getItem('jobmatcher_saved_candidates');
+            if (storedStr) {
+                const stored = JSON.parse(storedStr);
+                const mapped = stored.map((c: any) => ({
+                    id: c.id,
+                    name: c.name,
+                    role: c.role,
+                    match: c.matchScore,
+                    status: c.status
+                }));
+                setCandidates([...mapped, ...mockCandidates].slice(0, 5));
+            }
+        } catch (e) {
+            console.error('Failed to load saved candidates from localStorage', e);
+        }
+    }, []);
 
     return (
         <div className="dashboard-page">

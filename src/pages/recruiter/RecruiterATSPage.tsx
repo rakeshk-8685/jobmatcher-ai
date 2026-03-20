@@ -19,7 +19,8 @@ import {
     FileSearch,
     Upload,
     X,
-    Users
+    Users,
+    ChevronDown
 } from 'lucide-react';
 import { analyzeResume } from '../../services/ats';
 import type { ATSScoreResult } from '../../services/ats';
@@ -53,13 +54,21 @@ const RecruiterATSPage: React.FC = () => {
         if (!file) return;
 
         setResumeFileName(file.name);
+        setIsAnalyzing(true);
 
         try {
-            const text = await file.text();
-            setResumeText(text);
+            if (file.type === 'text/plain') {
+                const text = await file.text();
+                setResumeText(text);
+            } else {
+                const parsed = await import('../../services/ats').then(m => m.parseResumeFile(file));
+                setResumeText(parsed.text);
+            }
         } catch (error) {
             console.error('Error reading resume file:', error);
-            alert('Error reading file. Please try again or paste the resume directly.');
+            alert(`Error parsing file: ${error instanceof Error ? error.message : String(error)}`);
+        } finally {
+            setIsAnalyzing(false);
         }
     };
 
@@ -215,19 +224,21 @@ Education: BS Computer Science, State University (2019)
                         </div>
                     )}
                     <div style={{ marginBottom: 'var(--spacing-3)' }}>
-                        <select
-                            className="form-input"
-                            value={selectedCandidateId}
-                            onChange={(e) => handleCandidateSelect(e.target.value)}
-                            style={{ width: '100%' }}
-                        >
-                            <option value="">-- Or select from applicants --</option>
-                            {mockCandidates.map(candidate => (
-                                <option key={candidate.id} value={candidate.id}>
-                                    {candidate.name} - {candidate.role}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="ats-select-wrapper">
+                            <select
+                                className="ats-select"
+                                value={selectedCandidateId}
+                                onChange={(e) => handleCandidateSelect(e.target.value)}
+                            >
+                                <option value="">-- Or select from applicants --</option>
+                                {mockCandidates.map(candidate => (
+                                    <option key={candidate.id} value={candidate.id}>
+                                        {candidate.name} - {candidate.role}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown className="ats-select-arrow" size={16} />
+                        </div>
                     </div>
                     <textarea
                         className="ats-textarea"
@@ -252,19 +263,21 @@ Supported formats: .txt, .pdf, .doc, .docx"
                         <h3><Briefcase size={20} /> Your Job Posting</h3>
                     </div>
                     <div style={{ marginBottom: 'var(--spacing-3)' }}>
-                        <select
-                            className="form-input"
-                            value={selectedJobId}
-                            onChange={(e) => handleJobSelect(e.target.value)}
-                            style={{ width: '100%' }}
-                        >
-                            <option value="">-- Select from your job postings --</option>
-                            {mockJobs.map(job => (
-                                <option key={job.id} value={job.id}>
-                                    {job.title} at {job.company}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="ats-select-wrapper">
+                            <select
+                                className="ats-select"
+                                value={selectedJobId}
+                                onChange={(e) => handleJobSelect(e.target.value)}
+                            >
+                                <option value="">-- Select from your job postings --</option>
+                                {mockJobs.map(job => (
+                                    <option key={job.id} value={job.id}>
+                                        {job.title} at {job.company}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown className="ats-select-arrow" size={16} />
+                        </div>
                     </div>
                     <textarea
                         className="ats-textarea"

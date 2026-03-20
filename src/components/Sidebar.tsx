@@ -19,6 +19,7 @@ import {
     Sparkles,
     Zap,
     Bell,
+    Home,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import type { UserRole } from '../types';
@@ -145,9 +146,9 @@ const Sidebar: React.FC = () => {
 
             {/* Sidebar Footer */}
             <div className="sidebar-footer">
-                <NavLink to="/settings" className="sidebar-nav-item">
-                    <span className="sidebar-nav-icon"><Settings size={20} /></span>
-                    <span className="sidebar-nav-label-text">Settings</span>
+                <NavLink to="/" className="sidebar-nav-item">
+                    <span className="sidebar-nav-icon"><Home size={20} /></span>
+                    <span className="sidebar-nav-label-text">Back to Home</span>
                 </NavLink>
             </div>
         </aside>

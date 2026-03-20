@@ -8,12 +8,10 @@ import {
     Search,
     MapPin,
     Briefcase,
+    IndianRupee,
     Clock,
-    DollarSign,
     Filter,
-    Sparkles,
-    ArrowRight,
-    Loader2
+    ArrowRight
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { getJobs, type JobData } from '../services/jobs';
@@ -21,7 +19,6 @@ import './LandingPage.css';
 
 const JobsPage: React.FC = () => {
     const [jobs, setJobs] = useState<JobData[]>([]);
-    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [locationFilter, setLocationFilter] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
@@ -29,14 +26,11 @@ const JobsPage: React.FC = () => {
     // Fetch jobs from API on mount
     useEffect(() => {
         const fetchJobs = async () => {
-            setLoading(true);
             try {
                 const data = await getJobs();
                 setJobs(data);
             } catch (error) {
                 console.error('Error fetching jobs:', error);
-            } finally {
-                setLoading(false);
             }
         };
         fetchJobs();
@@ -128,8 +122,8 @@ const JobsPage: React.FC = () => {
                                     <span><Briefcase size={14} /> {job.type}</span>
                                     <span><Clock size={14} /> {job.experienceLevel}</span>
                                     <span>
-                                        <DollarSign size={14} />
-                                        ${job.salary?.min ? (job.salary.min / 1000).toFixed(0) : 0}k - ${job.salary?.max ? (job.salary.max / 1000).toFixed(0) : 0}k
+                                        <IndianRupee size={14} />
+                                        ₹{job.salary?.min ? (job.salary.min / 100000).toFixed(1) : 0}L - ₹{job.salary?.max ? (job.salary.max / 100000).toFixed(1) : 0}L
                                     </span>
                                 </div>
 

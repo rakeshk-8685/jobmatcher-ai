@@ -18,6 +18,7 @@ import {
     SortDesc,
     ChevronLeft,
     ChevronRight,
+    ChevronDown,
     Loader2,
     FolderOpen,
     BarChart3,
@@ -27,7 +28,7 @@ import {
     Archive
 } from 'lucide-react';
 import JSZip from 'jszip';
-import { analyzeResumesBatch, type BatchResumeItem } from '../../services/ats';
+import { analyzeResumesBatch, parseResumesBatch, type BatchResumeItem } from '../../services/ats';
 import { mockJobs } from '../../data/mockData';
 import './BulkATSAnalyzer.css';
 
@@ -104,13 +105,7 @@ const BulkATSAnalyzer: React.FC = () => {
         return { name, email };
     };
 
-    // Get score status
-    const getScoreStatus = (score: number): 'excellent' | 'good' | 'partial' | 'poor' => {
-        if (score >= 80) return 'excellent';
-        if (score >= 65) return 'good';
-        if (score >= 50) return 'partial';
-        return 'poor';
-    };
+
 
     // Extract files from ZIP archive
     const extractZipFiles = async (zipFile: File): Promise<File[]> => {
@@ -226,95 +221,195 @@ Experience: ${job.experience} level
         }
     };
 
-    // Analyze all resumes using optimized batch API
+    // Analyze all resumes using ultra-optimized multi-stage batching
     const handleBulkAnalyze = async () => {
         if (files.length === 0 || !jobDescription.trim()) return;
 
         setIsAnalyzing(true);
         setProgress({ processed: 0, total: files.length });
 
-        // OPTIMIZED: Process 50 resumes per batch (5x more than before)
-        const batchSize = 50;
+        // ULTRA-OPTIMIZED: 100 resumes per batch + Multi-Batch Concurrency
+        const batchSize = 100;
         const pendingFiles = files.filter(f => f.status === 'pending' || f.status === 'error');
-
-        // Extract skills from job description
         const skillsFromJD = mockJobs.find(j => j.id === selectedJobId)?.skills || [];
 
+        // Split into chunks/batches
+        const chunks: ResumeFile[][] = [];
         for (let i = 0; i < pendingFiles.length; i += batchSize) {
-            const batch = pendingFiles.slice(i, i + batchSize);
+            chunks.push(pendingFiles.slice(i, i + batchSize));
+        }
 
+        let processedCount = 0;
+
+        // Worker function to process a single chunk
+        const processChunk = async (batch: ResumeFile[]) => {
             // Mark batch as processing
             setFiles(prev => prev.map(f =>
-                batch.find(b => b.id === f.id)
-                    ? { ...f, status: 'processing' as const }
-                    : f
+                batch.find(b => b.id === f.id) ? { ...f, status: 'processing' as const } : f
             ));
 
             try {
-                // Read all file texts in parallel
-                const fileTexts = await Promise.all(
-                    batch.map(async (resumeFile) => {
-                        const text = await resumeFile.file.text();
-                        return { id: resumeFile.id, text, name: resumeFile.name };
-                    })
-                );
+                // 1. STAGE 1: BATCH PARSING
+                // Use file extension instead of MIME type (ZIP-extracted files often have empty MIME)
+                const isTextFile = (f: ResumeFile) => {
+                    const ext = f.name.split('.').pop()?.toLowerCase();
+                    return ext === 'txt';
+                };
+                const txtFiles = batch.filter(f => isTextFile(f));
+                const binaryFiles = batch.filter(f => !isTextFile(f));
 
-                // Build batch request items
-                const batchItems: BatchResumeItem[] = fileTexts.map(ft => ({
-                    resume_text: ft.text,
-                    file_name: ft.name,
+                let parsedResults: { text: string; name: string }[] = [];
+
+                // Handle text files locally (fast)
+                const txtResults = await Promise.all(
+                    txtFiles.map(async f => ({ text: await f.file.text(), name: f.name }))
+                );
+                parsedResults.push(...txtResults);
+
+                // Handle PDF/Docx via batch parse API (with fallback)
+                if (binaryFiles.length > 0) {
+                    try {
+                        const binaryFilesToParse = binaryFiles.map(f => f.file);
+                        const batchParseResults = await parseResumesBatch(binaryFilesToParse);
+
+                        // Match results back by index (preserved by backend)
+                        binaryFiles.forEach((f, idx) => {
+                            const result = batchParseResults[idx];
+                            if (result && result.success) {
+                                parsedResults.push({
+                                    text: result.data.text,
+                                    name: f.name
+                                });
+                            } else {
+                                // Mark this specific file as error immediately
+                                setFiles(prev => prev.map(file =>
+                                    file.id === f.id ? { ...file, status: 'error' as const, error: result?.error || 'Extraction failed' } : file
+                                ));
+                            }
+                        });
+                    } catch (parseError) {
+                        console.warn('Batch parse API unavailable, attempting to read binary files as text:', parseError);
+                        // Fallback: try to read binary files as raw text
+                        for (const f of binaryFiles) {
+                            try {
+                                const text = await f.file.text();
+                                if (text && text.trim().length > 20) {
+                                    parsedResults.push({ text, name: f.name });
+                                } else {
+                                    setFiles(prev => prev.map(file =>
+                                        file.id === f.id ? { ...file, status: 'error' as const, error: 'AI service unavailable for PDF/DOCX parsing' } : file
+                                    ));
+                                }
+                            } catch {
+                                setFiles(prev => prev.map(file =>
+                                    file.id === f.id ? { ...file, status: 'error' as const, error: 'Could not read file' } : file
+                                ));
+                            }
+                        }
+                    }
+                }
+
+                // If no files in this batch were successfully parsed, we're done with this chunk
+                if (parsedResults.length === 0) return;
+
+                // 2. STAGE 2: BATCH SCORING (Only for successfully parsed files)
+                const batchItems: BatchResumeItem[] = parsedResults.map(pr => ({
+                    resume_text: pr.text,
+                    file_name: pr.name,
                 }));
 
-                // SINGLE API CALL for entire batch (major optimization)
                 const batchResponse = await analyzeResumesBatch(
                     batchItems,
                     jobDescription,
                     skillsFromJD
                 );
 
-                // Map results back to files
-                setFiles(prev => prev.map(f => {
-                    const fileTextData = fileTexts.find(ft => ft.id === f.id);
-                    if (!fileTextData) return f;
+                const newlyCompleted: any[] = [];
+                const updatedFilesMap = new Map();
 
-                    const apiResult = batchResponse.results.find(
-                        r => r.file_name === fileTextData.name
-                    );
+                batch.forEach(f => {
+                    const parsedData = parsedResults.find(pr => pr.name.toLowerCase() === f.name.toLowerCase());
+                    if (!parsedData) return;
 
+                    const apiResult = batchResponse.results.find(r => r.file_name.toLowerCase() === f.name.toLowerCase());
                     if (apiResult) {
-                        const { name, email } = extractCandidateInfo(fileTextData.text, fileTextData.name);
-                        const result: BulkAnalysisResult = {
-                            fileName: apiResult.file_name,
-                            candidateName: name,
-                            email,
-                            overallScore: apiResult.overall,
-                            status: apiResult.status,
-                            matchedSkills: apiResult.matched_skills,
-                            missingSkills: apiResult.missing_skills,
-                            breakdown: apiResult.breakdown,
-                            analyzedAt: new Date()
-                        };
-                        return { ...f, status: 'completed' as const, result };
+                        const { name, email } = extractCandidateInfo(parsedData.text, f.name);
+                        
+                        const jobTitle = mockJobs.find(j => j.id === selectedJobId)?.title || 'Unknown Job';
+                        newlyCompleted.push({
+                            id: f.id,
+                            name: name || f.name,
+                            email: email || 'No Email',
+                            phone: 'N/A',
+                            role: jobTitle,
+                            location: 'Remote',
+                            experience: 'N/A',
+                            matchScore: apiResult.overall,
+                            skills: apiResult.matched_skills,
+                            status: 'new',
+                            appliedFor: jobTitle
+                        });
+
+                        updatedFilesMap.set(f.id, {
+                            ...f,
+                            status: 'completed' as const,
+                            result: {
+                                fileName: apiResult.file_name,
+                                candidateName: name, email,
+                                overallScore: apiResult.overall,
+                                status: apiResult.status,
+                                matchedSkills: apiResult.matched_skills,
+                                missingSkills: apiResult.missing_skills,
+                                breakdown: apiResult.breakdown,
+                                analyzedAt: new Date()
+                            }
+                        });
                     }
-                    return f;
-                }));
+                });
+
+                // Map results back to state
+                setFiles(prev => prev.map(f => updatedFilesMap.has(f.id) ? updatedFilesMap.get(f.id) : f));
+
+                if (newlyCompleted.length > 0) {
+                    try {
+                        const existingStr = localStorage.getItem('jobmatcher_saved_candidates');
+                        const existing = existingStr ? JSON.parse(existingStr) : [];
+                        localStorage.setItem('jobmatcher_saved_candidates', JSON.stringify([...existing, ...newlyCompleted]));
+                    } catch (e) {
+                        console.error('Failed to save to localStorage', e);
+                    }
+                }
 
             } catch (error) {
-                // Mark batch as error
+                console.error("Batch error:", error);
                 setFiles(prev => prev.map(f =>
                     batch.find(b => b.id === f.id)
                         ? { ...f, status: 'error' as const, error: String(error) }
                         : f
                 ));
+            } finally {
+                processedCount += batch.length;
+                setProgress({ processed: processedCount, total: pendingFiles.length });
             }
+        };
 
-            setProgress(prev => ({
-                ...prev,
-                processed: Math.min(i + batchSize, pendingFiles.length)
-            }));
+        // PARALLEL BATCH PROCESSING: Run up to 4 batches at once
+        // This pipelines I/O (uploading/parsing) with CPU (scoring)
+        const concurrencyLimit = 4;
+        const queue = [...chunks];
+        const activeWorkers: Promise<void>[] = [];
 
-            // Minimal delay to allow UI updates (reduced from 100ms to 50ms)
-            await new Promise(resolve => setTimeout(resolve, 50));
+        while (queue.length > 0 || activeWorkers.length > 0) {
+            while (queue.length > 0 && activeWorkers.length < concurrencyLimit) {
+                const chunk = queue.shift()!;
+                const worker = processChunk(chunk).then(() => {
+                    activeWorkers.splice(activeWorkers.indexOf(worker), 1);
+                });
+                activeWorkers.push(worker);
+            }
+            if (activeWorkers.length > 0) {
+                await Promise.race(activeWorkers);
+            }
         }
 
         setIsAnalyzing(false);
@@ -432,18 +527,21 @@ Experience: ${job.experience} level
                     <Briefcase size={20} />
                     <h3>Select Job Posting</h3>
                 </div>
-                <select
-                    className="form-input job-select"
-                    value={selectedJobId}
-                    onChange={(e) => handleJobSelect(e.target.value)}
-                >
-                    <option value="">-- Select a job posting to analyze against --</option>
-                    {mockJobs.map(job => (
-                        <option key={job.id} value={job.id}>
-                            {job.title} at {job.company}
-                        </option>
-                    ))}
-                </select>
+                <div className="ats-select-wrapper">
+                    <select
+                        className="ats-select"
+                        value={selectedJobId}
+                        onChange={(e) => handleJobSelect(e.target.value)}
+                    >
+                        <option value="">-- Select a job posting to analyze against --</option>
+                        {mockJobs.map(job => (
+                            <option key={job.id} value={job.id}>
+                                {job.title} at {job.company}
+                            </option>
+                        ))}
+                    </select>
+                    <ChevronDown className="ats-select-arrow" size={16} />
+                </div>
                 {jobDescription && (
                     <div className="job-preview">
                         <strong>Selected:</strong> {mockJobs.find(j => j.id === selectedJobId)?.title}
@@ -608,19 +706,24 @@ Experience: ${job.experience} level
                     <div className="results-filters">
                         <div className="filter-group">
                             <Filter size={16} />
-                            <select
-                                value={scoreFilter}
-                                onChange={(e) => {
-                                    setScoreFilter(e.target.value as typeof scoreFilter);
-                                    setCurrentPage(1);
-                                }}
-                            >
-                                <option value="all">All Results</option>
-                                <option value="excellent">Excellent (80+)</option>
-                                <option value="good">Good (65-79)</option>
-                                <option value="partial">Partial (50-64)</option>
-                                <option value="poor">Poor (&lt;50)</option>
-                            </select>
+                            <div className="ats-select-wrapper">
+                                <select
+                                    className="ats-select"
+                                    value={scoreFilter}
+                                    onChange={(e) => {
+                                        setScoreFilter(e.target.value as typeof scoreFilter);
+                                        setCurrentPage(1);
+                                    }}
+                                    style={{ paddingRight: '32px' }}
+                                >
+                                    <option value="all">All Results</option>
+                                    <option value="excellent">Excellent (80+)</option>
+                                    <option value="good">Good (65-79)</option>
+                                    <option value="partial">Partial (50-64)</option>
+                                    <option value="poor">Poor (&lt;50)</option>
+                                </select>
+                                <ChevronDown className="ats-select-arrow" size={14} />
+                            </div>
                         </div>
                         <div className="sort-group">
                             <button

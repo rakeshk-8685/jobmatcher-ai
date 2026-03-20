@@ -8,13 +8,12 @@ import { useNavigate } from 'react-router-dom';
 import {
     Briefcase,
     MapPin,
-    DollarSign,
+    IndianRupee,
     Clock,
     FileText,
     Code,
     GraduationCap,
     Users,
-    Send,
     Save,
     Eye,
     Plus,
@@ -166,7 +165,7 @@ const PostJobPage: React.FC = () => {
                 salary: {
                     min: parseInt(formData.salary.min) || 0,
                     max: parseInt(formData.salary.max) || 0,
-                    currency: 'USD',
+                    currency: 'INR',
                     isVisible: true
                 },
                 description: formData.description,
@@ -363,25 +362,25 @@ const PostJobPage: React.FC = () => {
 
                                     <div className="salary-section">
                                         <label>
-                                            <DollarSign size={16} />
+                                            <IndianRupee size={16} />
                                             Salary Range (Annual)
                                         </label>
                                         <div className="salary-inputs">
                                             <div className="salary-input">
-                                                <span className="currency">$</span>
+                                                <span className="currency">₹</span>
                                                 <input
                                                     type="number"
-                                                    placeholder="80,000"
+                                                    placeholder="8,00,000"
                                                     value={formData.salary.min}
                                                     onChange={(e) => handleSalaryChange('min', e.target.value)}
                                                 />
                                             </div>
                                             <span className="salary-to">to</span>
                                             <div className="salary-input">
-                                                <span className="currency">$</span>
+                                                <span className="currency">₹</span>
                                                 <input
                                                     type="number"
-                                                    placeholder="120,000"
+                                                    placeholder="12,00,000"
                                                     value={formData.salary.max}
                                                     onChange={(e) => handleSalaryChange('max', e.target.value)}
                                                 />
@@ -611,8 +610,8 @@ We're looking for a passionate developer to join our growing team. You'll work o
                                             <span><GraduationCap size={14} /> {formData.experience} level</span>
                                             {formData.salary.min && formData.salary.max && (
                                                 <span className="salary-badge">
-                                                    <DollarSign size={14} />
-                                                    ${Number(formData.salary.min).toLocaleString()} - ${Number(formData.salary.max).toLocaleString()}
+                                                    <IndianRupee size={14} />
+                                                    ₹{Number(formData.salary.min).toLocaleString('en-IN')} - ₹{Number(formData.salary.max).toLocaleString('en-IN')}
                                                 </span>
                                             )}
                                         </div>
@@ -749,7 +748,7 @@ We're looking for a passionate developer to join our growing team. You'll work o
                                 <span><Clock size={16} /> {formData.type}</span>
                                 <span><GraduationCap size={16} /> {formData.experience}</span>
                                 {formData.salary.min && (
-                                    <span><DollarSign size={16} /> ${formData.salary.min}k - ${formData.salary.max}k</span>
+                                    <span><IndianRupee size={16} /> ₹{Number(formData.salary.min).toLocaleString('en-IN')} - ₹{Number(formData.salary.max).toLocaleString('en-IN')}</span>
                                 )}
                             </div>
                         </div>

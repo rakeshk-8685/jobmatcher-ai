@@ -44,13 +44,24 @@ const ATSScorePage: React.FC = () => {
         if (!file) return;
 
         setResumeFileName(file.name);
+        setIsAnalyzing(true); // Show some loading state if possible, or just wait
 
         try {
-            const text = await file.text();
-            setResumeText(text);
+            // If it's a text file, we can still read it directly, but let's use the backend for consistency
+            // especially for PDFs and Docs
+            if (file.type === 'text/plain') {
+                const text = await file.text();
+                setResumeText(text);
+            } else {
+                // Use backend parser
+                const parsed = await import('../../services/ats').then(m => m.parseResumeFile(file));
+                setResumeText(parsed.text);
+            }
         } catch (error) {
             console.error('Error reading resume file:', error);
-            alert('Error reading file. Please try again or paste your resume directly.');
+            alert(`Error parsing file: ${error instanceof Error ? error.message : String(error)}`);
+        } finally {
+            setIsAnalyzing(false);
         }
     };
 
@@ -63,11 +74,16 @@ const ATSScorePage: React.FC = () => {
         setSelectedJobId('');
 
         try {
-            const text = await file.text();
-            setJobDescription(text);
+            if (file.type === 'text/plain') {
+                const text = await file.text();
+                setJobDescription(text);
+            } else {
+                const parsed = await import('../../services/ats').then(m => m.parseResumeFile(file));
+                setJobDescription(parsed.text);
+            }
         } catch (error) {
             console.error('Error reading JD file:', error);
-            alert('Error reading file. Please try again or paste the job description directly.');
+            alert('Error parsing file. Please try again or paste the job description directly.');
         }
     };
 

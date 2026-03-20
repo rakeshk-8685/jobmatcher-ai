@@ -1,0 +1,213 @@
+/* Admin Pages Styles */
+
+/* ============================================
+   Admin Filters Redesign
+   ============================================ */
+.admin-filters-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-filters-row {
+    display: flex;
+    align-items: flex-end;
+    /* Align inputs to bottom */
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.admin-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.admin-filter-group.grow {
+    flex: 1;
+    min-width: 250px;
+}
+
+.admin-filter-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 0.25rem;
+}
+
+.admin-filter-group .form-input {
+    height: 42px;
+    /* Slightly more compact than 48px */
+    padding: 0 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.admin-filter-group .form-input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-surface);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    outline: none;
+}
+
+.search-input-wrapper {
+    width: 100%;
+}
+
+/* ============================================
+   Stats Grid Override for Admin
+   ============================================ */
+.stats-grid.four-col {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.stat-icon.purple {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.stat-icon.danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.report-count.danger {
+    color: #ef4444;
+    font-weight: 500;
+}
+
+.report-count.safe {
+    color: #10b981;
+    font-weight: 500;
+}
+
+.role-email-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.email-text {
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-cell-id {
+    font-size: 0.7rem;
+    color: var(--color-text-tertiary);
+}
+
+/* Moderation Styles */
+.job-item-moderation {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    gap: 1.5rem;
+}
+
+.job-item-moderation:last-child {
+    border-bottom: none;
+}
+
+.moderation-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.moderation-status.pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.moderation-status.approved {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.moderation-status.rejected {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+/* Analytics Styles */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.analytics-chart-container {
+    height: 300px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 2rem 1rem 0;
+    gap: 1rem;
+}
+
+.chart-bar-wrapper {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-bar {
+    width: 100%;
+    background: var(--color-primary);
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s ease;
+    opacity: 0.8;
+}
+
+.chart-bar:hover {
+    opacity: 1;
+}
+
+.chart-label {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+}
+
+.chart-tooltip {
+    position: absolute;
+    background: var(--color-bg-primary);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-md);
+    font-size: 0.75rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    border: 1px solid var(--color-border);
+}
+
+.chart-bar:hover .chart-tooltip {
+    opacity: 1;
+}

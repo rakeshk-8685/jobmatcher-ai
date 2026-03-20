@@ -28,7 +28,25 @@ export interface UserProfile {
 
 // Helper to wait for auth to be ready
 const ensureAuthenticated = async () => {
+    // 1. Check Firebase Auth first
     if (auth.currentUser) return auth.currentUser;
+
+    // 2. Check Local Storage for Mock User (Demo Mode)
+    const storedAuth = localStorage.getItem('jobmatcher_auth');
+    if (storedAuth) {
+        try {
+            const parsed = JSON.parse(storedAuth);
+            // If it's a mock user (usually they have IDs like USR-...) AND no firebase user is expected
+            // We return this object. We need to distinguish it.
+            if (parsed && parsed.id) {
+                console.log('userService - Found persisted user in localStorage');
+                // We add a flag to know it's a mock user
+                return { ...parsed, isMock: true, uid: parsed.id };
+            }
+        } catch (e) {
+            console.error('Error parsing stored auth', e);
+        }
+    }
 
     console.log('userService - Waiting for Firebase Auth...');
     return new Promise<any>((resolve) => {
@@ -44,6 +62,15 @@ const ensureAuthenticated = async () => {
         setTimeout(() => {
             unsubscribe();
             console.log('userService - Firebase Auth Timeout');
+            // Final check for local storage
+            const finalStored = localStorage.getItem('jobmatcher_auth');
+            if (finalStored) {
+                try {
+                    const parsed = JSON.parse(finalStored);
+                    if (parsed) resolve({ ...parsed, isMock: true, uid: parsed.id });
+                    return;
+                } catch { }
+            }
             resolve(auth.currentUser); // Return whatever we have (likely null)
         }, 2000);
     });
@@ -52,11 +79,30 @@ const ensureAuthenticated = async () => {
 export const userService = {
     getProfile: async () => {
         const user = await ensureAuthenticated();
-        console.log('userService.getProfile - Current Firebase User:', user?.uid);
+        console.log('userService.getProfile - Current User:', user?.uid, 'Is Mock:', user?.isMock);
 
         if (!user) {
-            console.error('userService.getProfile - No authenticated user found in firebase.auth()');
+            console.error('userService.getProfile - No authenticated user found');
             throw new Error('User not authenticated');
+        }
+
+        // Handle Mock User (Demo Mode)
+        if (user.isMock) {
+            console.log('userService.getProfile - Returning Mock Data');
+            // Return data from the local user object or reasonable defaults
+            // We can assume the persisted user object has the key fields
+            return {
+                data: {
+                    name: user.name || 'Demo User',
+                    email: user.email || 'demo@example.com',
+                    role: user.role || 'user',
+                    profile: {
+                        // Populate with some defaults if missing, or use what's in 'user' if we stored it there
+                        title: 'Demo Title',
+                        bio: 'This is a demo account. Profile changes will not be saved to the database.',
+                    }
+                } as UserProfile
+            };
         }
 
         const userDocRef = doc(db, 'users', user.uid);
@@ -87,9 +133,26 @@ export const userService = {
 
     updateProfile: async (data: Partial<UserProfile> | any) => {
         const user = await ensureAuthenticated();
-        console.log('userService.updateProfile - Current Firebase User:', user?.uid);
+        console.log('userService.updateProfile - Current User:', user?.uid, 'Is Mock:', user?.isMock);
 
         if (!user) throw new Error('User not authenticated');
+
+        // Handle Mock User
+        if (user.isMock) {
+            console.log('userService.updateProfile - Updating Mock Data (Local Only)');
+            // For demo users, we can just update the local storage to simulate "saving"
+            const storedAuth = localStorage.getItem('jobmatcher_auth');
+            if (storedAuth) {
+                const parsed = JSON.parse(storedAuth);
+                const updatedUser = {
+                    ...parsed,
+                    name: data.name || parsed.name,
+                    // Store other profile fields if we wanted to be fancy, but simple name update is enough for demo feedback
+                };
+                localStorage.setItem('jobmatcher_auth', JSON.stringify(updatedUser));
+            }
+            return { data };
+        }
 
         const userDocRef = doc(db, 'users', user.uid);
 

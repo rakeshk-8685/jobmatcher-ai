@@ -8,6 +8,7 @@ import type { User, UserRole, AuthState, LoginCredentials, RegisterData } from '
 import { mockUsers } from '../data/mockData';
 import {
     signInWithGoogle,
+    signInWithEmail,
     signUpWithEmail,
     firebaseSignOut,
     onAuthChange,
@@ -98,53 +99,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setState(prev => ({ ...prev, isLoading: true }));
 
         try {
-            // Call backend API
-            const response = await fetch('http://localhost:5000/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: credentials.email,
-                    password: credentials.password
-                })
-            });
+            // 1. Try Firebase Auth first (since register() uses Firebase)
+            const firebaseUser = await signInWithEmail(credentials.email, credentials.password);
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Login failed');
+            if (firebaseUser) {
+                const user = firebaseUserToAppUser(firebaseUser, credentials.role || 'user');
+                localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+                setState({
+                    user,
+                    isAuthenticated: true,
+                    isLoading: false,
+                });
+                return true;
             }
 
-            // Backend returns: { success: true, data: { user, accessToken, refreshToken } }
-            const { user: backendUser, accessToken } = data.data;
+            // Should not reach here if signInWithEmail throws on error, but just in case
+            throw new Error('Firebase login returned no user');
 
-            // Merge backend user with app user structure if needed, or just use backend user
-            // We MUST store the accessToken so api.ts can find it
-            const appUser = {
-                ...backendUser,
-                token: accessToken // Store token with user object for api.ts to find
-            };
+        } catch (error: any) {
+            console.error('Firebase Login failed:', error);
 
-            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(appUser));
-            setState({
-                user: appUser,
-                isAuthenticated: true,
-                isLoading: false,
-            });
-            return true;
-
-        } catch (error) {
-            console.error('Login failed:', error);
-
-            // Fallback: Check if credentials match any mock user (for demo purposes when backend is down)
+            // 2. Fallback: Check if credentials match any mock user (for demo buttons or hardcoded demo accounts)
+            // This is useful if the user tries 'candidate@demo.com' which might not be in Firebase yet
             const mockUser = mockUsers.find(
                 u => u.email === credentials.email &&
-                    u.password === credentials.password // Note: In real app, never compare plain text passwords like this
+                    u.password === credentials.password
             );
 
             if (mockUser) {
-                console.log('Backend unavailable. Logging in with mock data.');
-
-                // Mimic backend response structure
+                console.log('Logging in with mock data (Fallback).');
                 const appUser = {
                     ...mockUser,
                     token: 'mock-jwt-token-' + Date.now()
@@ -159,6 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return true;
             }
 
+            // If neither worked
             setState(prev => ({ ...prev, isLoading: false }));
             return false;
         }
