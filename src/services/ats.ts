@@ -3,7 +3,29 @@
 // Interfaces with AI service for resume analysis
 // ============================================
 
-const AI_SERVICE_URL = 'http://localhost:8000';
+const AI_SERVICE_URL = import.meta.env.VITE_AI_SERVICE_URL || 'http://localhost:8000';
+
+/**
+ * Generic fetch with retry logic for robust API communication
+ */
+async function fetchWithRetry(url: string, options: RequestInit, retries = 2, delay = 1000): Promise<Response> {
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok && retries > 0 && response.status >= 500) {
+            console.warn(`Fetch failed with status ${response.status}. Retrying in ${delay}ms... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return fetchWithRetry(url, options, retries - 1, delay * 2);
+        }
+        return response;
+    } catch (error) {
+        if (retries > 0) {
+            console.warn(`Network error: ${error}. Retrying in ${delay}ms... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return fetchWithRetry(url, options, retries - 1, delay * 2);
+        }
+        throw error;
+    }
+}
 
 export interface ATSScoreResult {
     overall: number;
@@ -37,8 +59,9 @@ export interface ATSAnalysisRequest {
  * Falls back to mock scoring if AI service is unavailable
  */
 export async function analyzeResume(request: ATSAnalysisRequest): Promise<ATSScoreResult> {
+    console.log(`[ATS Service] Analyzing resume...`);
     try {
-        const response = await fetch(`${AI_SERVICE_URL}/ai/ats-score`, {
+        const response = await fetchWithRetry(`${AI_SERVICE_URL}/ai/ats-score`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -55,14 +78,86 @@ export async function analyzeResume(request: ATSAnalysisRequest): Promise<ATSSco
         });
 
         if (!response.ok) {
-            throw new Error('AI service error');
+            throw new Error(`AI service error: ${response.statusText}`);
         }
 
         const data = await response.json();
         return data.data;
     } catch (error) {
-        console.warn('AI service unavailable, using mock scoring:', error);
+        console.warn('AI service unavailable after retries, using mock scoring:', error);
         return calculateMockScore(request);
+    }
+}
+
+export interface ParsedResume {
+    text: string;
+    skills: string[];
+    experience_years: number;
+    education: {
+        degrees: string[];
+        highest_level: string | null;
+    };
+    contact: {
+        email: string | null;
+        phone: string | null;
+    };
+}
+
+export async function parseResumeFile(file: File): Promise<ParsedResume> {
+    console.log(`[ATS Service] Parsing single resume: ${file.name}`);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetchWithRetry(`${AI_SERVICE_URL}/ai/parse-resume-file`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to parse resume file: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to parse resume');
+        }
+        return data.data;
+    } catch (error) {
+        console.error('Error parsing resume after retries:', error);
+        throw error;
+    }
+}
+
+/**
+ * Parse multiple resume files in a single batch request (Ultra Optimized)
+ */
+export async function parseResumesBatch(files: File[]): Promise<any[]> {
+    console.log(`[ATS Service] Batch parsing ${files.length} resumes...`);
+    const formData = new FormData();
+    files.forEach(file => {
+        formData.append('files', file);
+    });
+
+    try {
+        const response = await fetchWithRetry(`${AI_SERVICE_URL}/ai/batch-parse-resume-files`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Batch parsing service error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to parse resumes in batch');
+        }
+
+        return data.results;
+    } catch (error) {
+        console.error('Error parsing resumes batch after retries:', error);
+        throw error;
     }
 }
 
@@ -221,8 +316,9 @@ export async function analyzeResumesBatch(
     requiredExperience?: number,
     requiredEducation?: string
 ): Promise<BatchATSResponse> {
+    console.log(`[ATS Service] Batch analyzing ${resumes.length} resumes...`);
     try {
-        const response = await fetch(`${AI_SERVICE_URL}/ai/batch-ats-score`, {
+        const response = await fetchWithRetry(`${AI_SERVICE_URL}/ai/batch-ats-score`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -237,13 +333,13 @@ export async function analyzeResumesBatch(
         });
 
         if (!response.ok) {
-            throw new Error('Batch AI service error');
+            throw new Error(`Batch AI service error: ${response.statusText}`);
         }
 
         const data = await response.json();
         return data.data;
     } catch (error) {
-        console.warn('Batch AI service unavailable, falling back to mock:', error);
+        console.warn('Batch AI service unavailable after retries, falling back to mock:', error);
         return calculateMockBatchScores(resumes, jobDescription, requiredSkills);
     }
 }

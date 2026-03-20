@@ -56,7 +56,97 @@
     align-items: center;
     gap: var(--spacing-2);
     text-decoration: none;
-    margin-bottom: var(--spacing-12);
+    margin-bottom: var(--spacing-6);
+}
+
+/* Animated Illustration Container */
+.auth-illustration {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    margin-bottom: var(--spacing-6);
+}
+
+.auth-hero-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: var(--radius-2xl);
+    animation: float 6s ease-in-out infinite;
+    filter: drop-shadow(0 20px 40px rgba(99, 102, 241, 0.3));
+}
+
+/* Floating Elements */
+.floating-element {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    opacity: 0.6;
+    filter: blur(1px);
+}
+
+.floating-1 {
+    width: 60px;
+    height: 60px;
+    top: 10%;
+    left: 10%;
+    animation: float 4s ease-in-out infinite, pulse 3s ease-in-out infinite;
+}
+
+.floating-2 {
+    width: 40px;
+    height: 40px;
+    top: 20%;
+    right: 15%;
+    animation: float 5s ease-in-out infinite reverse, pulse 4s ease-in-out infinite;
+    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+}
+
+.floating-3 {
+    width: 80px;
+    height: 80px;
+    bottom: 15%;
+    left: 20%;
+    animation: float 7s ease-in-out infinite, pulse 5s ease-in-out infinite;
+    background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+}
+
+/* Keyframe Animations */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    25% {
+        transform: translateY(-15px) rotate(2deg);
+    }
+
+    50% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    75% {
+        transform: translateY(10px) rotate(-2deg);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
 }
 
 .auth-branding-content {
@@ -393,6 +483,59 @@
     margin-top: var(--spacing-6);
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
+}
+
+/* Google Sign In Button */
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-4);
+    background: white;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-google:hover {
+    background: #f8f9fa;
+    border-color: #d2d4d8;
+    box-shadow: 0 1px 3px rgba(60, 64, 67, 0.15);
+}
+
+.btn-google:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-google svg {
+    color: #4285f4;
+}
+
+.demo-credentials {
+    background: var(--color-surface-glass);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+}
+
+.demo-credentials-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+}
+
+.demo-credentials-info strong {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-1);
 }
 
 @media (max-width: 1024px) {

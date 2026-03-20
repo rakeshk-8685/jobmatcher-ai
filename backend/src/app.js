@@ -10,6 +10,7 @@ const path = require('path');
 // Import routes
 const authRoutes = require('./modules/auth/auth.routes');
 const jobRoutes = require('./modules/job/job.routes');
+const userRoutes = require('./modules/user/user.routes');
 
 // Import middleware
 const errorHandler = require('./middlewares/errorHandler');
@@ -48,6 +49,7 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/users', userRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

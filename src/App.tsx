@@ -23,6 +23,7 @@ import JobMatchesPage from './pages/user/JobMatchesPage';
 import ApplicationsPage from './pages/user/ApplicationsPage';
 import SettingsPage from './pages/user/SettingsPage';
 import ATSScorePage from './pages/user/ATSScorePage';
+import NotificationsPage from './pages/user/NotificationsPage';
 
 // Recruiter Dashboard Pages
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard';
@@ -34,21 +35,13 @@ import MyJobsPage from './pages/recruiter/MyJobsPage';
 
 // Admin Dashboard Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
+import UserManagementPage from './pages/admin/UserManagementPage';
+import JobModerationPage from './pages/admin/JobModerationPage';
+import AnalyticsPage from './pages/admin/AnalyticsPage';
 
 // Styles
 import './pages/PagesStyles.css';
 import './pages/user/DashboardPages.css';
-
-// Placeholder for pages not yet implemented
-const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
-  <div className="dashboard-page">
-    <h1 className="dashboard-title">{title}</h1>
-    <p className="dashboard-subtitle">This page is under construction.</p>
-    <div className="card" style={{ marginTop: '2rem', padding: '3rem', textAlign: 'center' }}>
-      <p style={{ color: 'var(--color-text-tertiary)' }}>Coming soon...</p>
-    </div>
-  </div>
-);
 
 const App: React.FC = () => {
   return (
@@ -75,6 +68,7 @@ const App: React.FC = () => {
               <Route path="jobs" element={<JobMatchesPage />} />
               <Route path="applications" element={<ApplicationsPage />} />
               <Route path="ats-score" element={<ATSScorePage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
 
@@ -93,6 +87,7 @@ const App: React.FC = () => {
               <Route path="applicants" element={<ApplicationsPage />} />
               <Route path="ats-analyzer" element={<RecruiterATSPage />} />
               <Route path="bulk-ats-analyzer" element={<BulkATSAnalyzer />} />
+              <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
 
@@ -105,9 +100,10 @@ const App: React.FC = () => {
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="profile" element={<ProfilePage />} />
-              <Route path="users" element={<PlaceholderPage title="User Management" />} />
-              <Route path="jobs" element={<PlaceholderPage title="Job Moderation" />} />
-              <Route path="analytics" element={<PlaceholderPage title="Platform Analytics" />} />
+              <Route path="users" element={<UserManagementPage />} />
+              <Route path="jobs" element={<JobModerationPage />} />
+              <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
 

@@ -2,33 +2,44 @@
 // Jobs Page - Public job listings
 // ============================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Search,
     MapPin,
     Briefcase,
+    IndianRupee,
     Clock,
-    DollarSign,
     Filter,
-    ChevronDown,
-    Sparkles,
     ArrowRight
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import { mockJobs } from '../data/mockData';
-import ThemeToggle from '../components/ThemeToggle';
+import { getJobs, type JobData } from '../services/jobs';
 import './LandingPage.css';
 
 const JobsPage: React.FC = () => {
+    const [jobs, setJobs] = useState<JobData[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [locationFilter, setLocationFilter] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
 
-    const filteredJobs = mockJobs.filter(job => {
+    // Fetch jobs from API on mount
+    useEffect(() => {
+        const fetchJobs = async () => {
+            try {
+                const data = await getJobs();
+                setJobs(data);
+            } catch (error) {
+                console.error('Error fetching jobs:', error);
+            }
+        };
+        fetchJobs();
+    }, []);
+
+    const filteredJobs = jobs.filter(job => {
         const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            job.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+            job.skills?.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
 
         const matchesLocation = !locationFilter || job.location.toLowerCase().includes(locationFilter.toLowerCase());
         const matchesType = !typeFilter || job.type === typeFilter;
@@ -45,7 +56,7 @@ const JobsPage: React.FC = () => {
                     {/* Header */}
                     <div className="jobs-header">
                         <h1>Find Your Perfect Job</h1>
-                        <p>Browse {mockJobs.length}+ opportunities matched to your skills</p>
+                        <p>Browse {jobs.length}+ opportunities matched to your skills</p>
                     </div>
 
                     {/* Search Bar */}
@@ -89,13 +100,13 @@ const JobsPage: React.FC = () => {
 
                     {/* Results Count */}
                     <p className="jobs-results-count">
-                        Showing {filteredJobs.length} of {mockJobs.length} jobs
+                        Showing {filteredJobs.length} of {jobs.length} jobs
                     </p>
 
                     {/* Job Listings */}
                     <div className="jobs-grid">
                         {filteredJobs.map((job) => (
-                            <div key={job.id} className="job-listing-card card">
+                            <div key={job._id || job.id} className="job-listing-card card">
                                 <div className="job-listing-header">
                                     <div className="job-company-logo">
                                         {job.company.charAt(0)}
@@ -104,21 +115,15 @@ const JobsPage: React.FC = () => {
                                         <h3>{job.title}</h3>
                                         <p className="job-company-name">{job.company}</p>
                                     </div>
-                                    {job.matchScore && (
-                                        <div className="job-match-badge">
-                                            <Sparkles size={14} />
-                                            {job.matchScore}% Match
-                                        </div>
-                                    )}
                                 </div>
 
                                 <div className="job-listing-meta">
                                     <span><MapPin size={14} /> {job.location}</span>
                                     <span><Briefcase size={14} /> {job.type}</span>
-                                    <span><Clock size={14} /> {job.experience}</span>
+                                    <span><Clock size={14} /> {job.experienceLevel}</span>
                                     <span>
-                                        <DollarSign size={14} />
-                                        ${(job.salary.min / 1000).toFixed(0)}k - ${(job.salary.max / 1000).toFixed(0)}k
+                                        <IndianRupee size={14} />
+                                        ₹{job.salary?.min ? (job.salary.min / 100000).toFixed(1) : 0}L - ₹{job.salary?.max ? (job.salary.max / 100000).toFixed(1) : 0}L
                                     </span>
                                 </div>
 
@@ -135,7 +140,7 @@ const JobsPage: React.FC = () => {
 
                                 <div className="job-listing-footer">
                                     <span className="job-posted-date">
-                                        Posted {new Date(job.postedAt).toLocaleDateString()}
+                                        Posted {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently'}
                                     </span>
                                     <Link to="/login" className="btn btn-primary btn-sm">
                                         Apply Now <ArrowRight size={16} />

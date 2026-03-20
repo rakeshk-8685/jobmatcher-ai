@@ -2,7 +2,7 @@
 // User Profile Page
 // ============================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Mail,
     Phone,
@@ -17,31 +17,101 @@ import {
     Linkedin,
     Globe
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { mockCandidateProfile } from '../../data/mockData';
+// import { useAuth } from '../../context/AuthContext';
+import { userService } from '../../services/userService';
 import '../user/Dashboard.css';
 
 const ProfilePage: React.FC = () => {
-    const { user } = useAuth();
+    // const { user: authUser } = useAuth(); // removed unused
     const [isEditing, setIsEditing] = useState(false);
-    const profile = mockCandidateProfile;
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
+    // Initial form state
     const [formData, setFormData] = useState({
-        name: user?.name || '',
-        email: user?.email || '',
-        phone: '+1 (555) 123-4567',
-        location: 'San Francisco, CA',
-        headline: profile.headline,
-        summary: profile.summary,
-        linkedIn: 'linkedin.com/in/johndeveloper',
-        github: 'github.com/johndeveloper',
-        portfolio: 'johndeveloper.com'
+        name: '',
+        email: '',
+        phone: '',
+        location: '',
+        headline: '',
+        summary: '',
+        linkedIn: '',
+        github: '',
+        portfolio: ''
     });
 
-    const handleSave = () => {
-        setIsEditing(false);
-        // In production: API call to save profile
+    const [profileData, setProfileData] = useState<any>(null); // Store full profile object
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                setIsLoading(true);
+                const response = await userService.getProfile();
+                const user = response.data;
+                setProfileData(user);
+
+                // Initialize form data from backend response
+                // Handle different data structures for differnet roles if needed
+                // For now, map based on the backend schema we implemented
+                const publicProfile = user.profile || {};
+
+                setFormData({
+                    name: user.name || '',
+                    email: user.email || '',
+                    phone: publicProfile.phone || '',
+                    location: publicProfile.location || '',
+                    headline: publicProfile.title || '', // Mapping title to headline
+                    summary: publicProfile.bio || '',
+                    linkedIn: publicProfile.linkedIn || '',
+                    github: publicProfile.github || '',
+                    portfolio: publicProfile.portfolio || ''
+                });
+
+            } catch (err) {
+                console.error("Failed to load profile", err);
+                setError("Failed to load profile data");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, []);
+
+    const handleSave = async () => {
+        try {
+            setIsLoading(true);
+            await userService.updateProfile({
+                name: formData.name,
+                // We are sending flattened fields as per our controller logic for 'user' role
+                // But generally keys should match what controller expects
+                headline: formData.headline, // Controller maps this to profile.title
+                summary: formData.summary,   // Controller maps this to profile.bio
+                phone: formData.phone,
+                location: formData.location,
+                linkedIn: formData.linkedIn,
+                github: formData.github,
+                portfolio: formData.portfolio
+            });
+            setIsEditing(false);
+            // Optionally refetch or just rely on local state update if we trust it
+            // fetchProfile(); 
+        } catch (err) {
+            console.error("Failed to save profile", err);
+            setError("Failed to save profile changes");
+        } finally {
+            setIsLoading(false);
+        }
     };
+
+    if (isLoading && !profileData) return <div className="p-8 text-center">Loading profile...</div>;
+
+    // Use mock data fallback for complex arrays if not yet in DB, or empty array
+    // The previous mockCandidateProfile had experience/education/skills. 
+    // We'll use profileData.profile.experience if available, else empty or fallback if you want to keep data visible for demo
+    const experience = profileData?.profile?.experience || [];
+    const education = profileData?.profile?.education || [];
+    const skills: any[] = profileData?.profile?.skills || []; // schema says string[], mock said object with level
 
     return (
         <div className="dashboard-page">
@@ -52,6 +122,8 @@ const ProfilePage: React.FC = () => {
                 </div>
             </div>
 
+            {error && <div className="alert alert-error" style={{ marginBottom: '1rem', color: 'red', padding: '1rem', background: '#fee' }}>{error}</div>}
+
             <div className="profile-grid">
                 {/* Profile Card */}
                 <div className="card profile-card">
@@ -59,13 +131,14 @@ const ProfilePage: React.FC = () => {
                         <button
                             className={`btn ${isEditing ? 'btn-primary' : 'btn-secondary'} btn-edit-profile`}
                             onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                            disabled={isLoading}
                         >
                             {isEditing ? <><Save size={16} /> Save</> : <><Edit2 size={16} /> Edit</>}
                         </button>
                     </div>
                     <div className="profile-header">
                         <div className="profile-avatar-large">
-                            {user?.name?.charAt(0).toUpperCase() || 'U'}
+                            {formData.name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                         {isEditing && (
                             <button className="btn btn-sm btn-secondary upload-btn">
@@ -81,6 +154,7 @@ const ProfilePage: React.FC = () => {
                                 className="input profile-name-input"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                placeholder="Your Name"
                             />
                         ) : (
                             <h2>{formData.name}</h2>
@@ -92,9 +166,10 @@ const ProfilePage: React.FC = () => {
                                 className="input"
                                 value={formData.headline}
                                 onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
+                                placeholder="Professional Headline"
                             />
                         ) : (
-                            <p className="profile-headline">{formData.headline}</p>
+                            <p className="profile-headline">{formData.headline || 'No headline set'}</p>
                         )}
                     </div>
 
@@ -111,9 +186,10 @@ const ProfilePage: React.FC = () => {
                                     className="input input-sm"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    placeholder="Phone Number"
                                 />
                             ) : (
-                                <span>{formData.phone}</span>
+                                <span>{formData.phone || 'No phone'}</span>
                             )}
                         </div>
                         <div className="contact-item">
@@ -124,9 +200,10 @@ const ProfilePage: React.FC = () => {
                                     className="input input-sm"
                                     value={formData.location}
                                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                                    placeholder="Location"
                                 />
                             ) : (
-                                <span>{formData.location}</span>
+                                <span>{formData.location || 'No location'}</span>
                             )}
                         </div>
                     </div>
@@ -167,9 +244,9 @@ const ProfilePage: React.FC = () => {
                             </div>
                         ) : (
                             <>
-                                <a href={`https://${formData.linkedIn}`} target="_blank" rel="noopener noreferrer" className="social-link" title={formData.linkedIn}><Linkedin size={18} /></a>
-                                <a href={`https://${formData.github}`} target="_blank" rel="noopener noreferrer" className="social-link" title={formData.github}><Github size={18} /></a>
-                                <a href={`https://${formData.portfolio}`} target="_blank" rel="noopener noreferrer" className="social-link" title={formData.portfolio}><Globe size={18} /></a>
+                                {formData.linkedIn && <a href={`https://${formData.linkedIn.replace('https://', '')}`} target="_blank" rel="noopener noreferrer" className="social-link" title={formData.linkedIn}><Linkedin size={18} /></a>}
+                                {formData.github && <a href={`https://${formData.github.replace('https://', '')}`} target="_blank" rel="noopener noreferrer" className="social-link" title={formData.github}><Github size={18} /></a>}
+                                {formData.portfolio && <a href={`https://${formData.portfolio.replace('https://', '')}`} target="_blank" rel="noopener noreferrer" className="social-link" title={formData.portfolio}><Globe size={18} /></a>}
                             </>
                         )}
                     </div>
@@ -184,31 +261,35 @@ const ProfilePage: React.FC = () => {
                             rows={4}
                             value={formData.summary}
                             onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                            placeholder="Tell us about yourself..."
                         />
                     ) : (
-                        <p className="profile-summary">{formData.summary}</p>
+                        <p className="profile-summary">{formData.summary || 'No summary provided.'}</p>
                     )}
                 </div>
 
-                {/* Experience Section */}
+                {/* Experience Section - Only showing if data exists or we add edit functionality for it later */}
+                {/* For now, we are just hiding the mock data if real data is empty, to not confuse user */}
                 <div className="card">
                     <h3 className="card-title">
                         <Briefcase size={18} /> Experience
                     </h3>
-                    {profile.experience.map((exp) => (
-                        <div key={exp.id} className="experience-item">
+                    {experience.length > 0 ? experience.map((exp: any, index: number) => (
+                        <div key={index} className="experience-item">
                             <div className="exp-icon"><Briefcase size={18} /></div>
                             <div className="exp-content">
                                 <h4>{exp.title}</h4>
                                 <p className="exp-company">{exp.company} • {exp.location}</p>
                                 <p className="exp-dates">
-                                    {new Date(exp.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} -
-                                    {exp.current ? ' Present' : new Date(exp.endDate!).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                                    {exp.startDate && new Date(exp.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} -
+                                    {exp.current ? ' Present' : (exp.endDate && new Date(exp.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }))}
                                 </p>
                                 <p className="exp-description">{exp.description}</p>
                             </div>
                         </div>
-                    ))}
+                    )) : (
+                        <p style={{ color: '#888', fontStyle: 'italic' }}>No experience listed.</p>
+                    )}
                 </div>
 
                 {/* Education Section */}
@@ -216,19 +297,20 @@ const ProfilePage: React.FC = () => {
                     <h3 className="card-title">
                         <GraduationCap size={18} /> Education
                     </h3>
-                    {profile.education.map((edu) => (
-                        <div key={edu.id} className="experience-item">
+                    {education.length > 0 ? education.map((edu: any, index: number) => (
+                        <div key={index} className="experience-item">
                             <div className="exp-icon"><GraduationCap size={18} /></div>
                             <div className="exp-content">
                                 <h4>{edu.degree} in {edu.field}</h4>
                                 <p className="exp-company">{edu.institution}</p>
                                 <p className="exp-dates">
-                                    Graduated {new Date(edu.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                                    {edu.grade && ` • ${edu.grade}`}
+                                    Graduated {edu.endDate && new Date(edu.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                                 </p>
                             </div>
                         </div>
-                    ))}
+                    )) : (
+                        <p style={{ color: '#888', fontStyle: 'italic' }}>No education listed.</p>
+                    )}
                 </div>
 
                 {/* Skills Section */}
@@ -237,12 +319,15 @@ const ProfilePage: React.FC = () => {
                         <Award size={18} /> Skills
                     </h3>
                     <div className="skills-grid">
-                        {profile.skills.map((skill) => (
-                            <div key={skill.name} className="skill-item">
-                                <span className="skill-name">{skill.name}</span>
-                                <span className={`skill-level ${skill.level}`}>{skill.level}</span>
+                        {skills.length > 0 ? skills.map((skill: any, index: number) => (
+                            <div key={index} className="skill-item">
+                                {/* Handling both string and object skill formats just in case */}
+                                <span className="skill-name">{typeof skill === 'string' ? skill : skill.name}</span>
+                                {typeof skill !== 'string' && skill.level && <span className={`skill-level ${skill.level}`}>{skill.level}</span>}
                             </div>
-                        ))}
+                        )) : (
+                            <p style={{ color: '#888', fontStyle: 'italic' }}>No skills listed.</p>
+                        )}
                     </div>
                 </div>
             </div>

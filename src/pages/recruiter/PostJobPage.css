@@ -74,32 +74,41 @@
 
 /* ===== Steps Progress ===== */
 .steps-container {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .steps-progress {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0;
-    padding: 1.5rem;
+    justify-content: space-between;
+    /* Spread out */
+    gap: 1rem;
+    padding: 2rem 4rem;
     background: var(--color-surface);
-    border-radius: 16px;
+    border-radius: 20px;
     border: 1px solid var(--color-border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .step {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     cursor: pointer;
     transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+    min-width: 100px;
+    /* Ensure click area */
 }
 
 .step-icon {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -107,39 +116,47 @@
     background: var(--color-surface-secondary);
     color: var(--color-text-tertiary);
     border: 2px solid var(--color-border);
-    transition: all 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1.2rem;
 }
 
 .step.active .step-icon {
     background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
     color: white;
     border-color: transparent;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
 }
 
 .step.current .step-icon {
-    transform: scale(1.1);
+    transform: scale(1.15) translateY(-4px);
+    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.5);
 }
 
 .step-title {
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--color-text-tertiary);
     transition: color 0.3s;
+    white-space: nowrap;
 }
 
 .step.active .step-title {
     color: var(--color-primary);
+    font-weight: 700;
 }
 
 .step-connector {
-    width: 80px;
-    height: 3px;
+    flex: 1;
+    height: 4px;
     background: var(--color-border);
-    margin: 0 0.5rem;
-    border-radius: 2px;
-    transition: background 0.3s;
-    margin-bottom: 24px;
+    margin: 0 1rem;
+    border-radius: 4px;
+    transition: background 0.4s ease;
+    margin-bottom: 28px;
+    /* Align with icon center approx */
+    position: relative;
+    z-index: 1;
 }
 
 .step-connector.active {
@@ -148,60 +165,29 @@
 
 /* ===== Form Container ===== */
 .form-container {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
-.step-content {
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.step-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.05));
-    border-radius: 12px;
-    border-left: 4px solid var(--color-primary);
-}
-
-.step-header svg {
-    color: var(--color-primary);
-}
-
-.step-header h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 0.15rem;
-}
-
-.step-header p {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-}
+/* ... (fadeIn animation remains same) ... */
 
 /* ===== Form Card ===== */
 .form-card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 16px;
-    padding: 1.75rem;
-    margin-bottom: 1rem;
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* ... (input styles) ... */
+
+/* ===== Job Preview Container override ===== */
+.job-preview-container {
+    max-width: 1000px;
+    /* Wider preview too */
+    margin: 0 auto;
 }
 
 .input-group {

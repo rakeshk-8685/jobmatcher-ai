@@ -2,7 +2,7 @@
 // My Jobs Page - Manage all job postings
 // ============================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Briefcase,
@@ -14,9 +14,9 @@ import {
     Trash2,
     Users,
     TrendingUp,
-    Clock,
     MapPin,
-    DollarSign,
+    IndianRupee,
+    Clock,
     MoreVertical,
     Copy,
     Pause,
@@ -24,44 +24,64 @@ import {
     CheckCircle,
     AlertCircle
 } from 'lucide-react';
-import { mockJobs } from '../../data/mockData';
+import { getMyJobs, type JobData } from '../../services/jobs';
 import '../user/DashboardPages.css';
 import './RecruiterPages.css';
 
 interface Job {
     id: string;
+    _id?: string;
     title: string;
     company: string;
     location: string;
     type: string;
-    salary: string;
-    status: 'active' | 'paused' | 'closed' | 'draft';
+    salary: { min: number; max: number };
+    status: 'active' | 'paused' | 'closed' | 'draft' | 'pending' | 'rejected';
     applicationsCount: number;
-    views: number;
+    viewsCount: number;
     createdAt: string;
     skills: string[];
 }
 
 const MyJobsPage: React.FC = () => {
+    const [jobs, setJobs] = useState<Job[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
-    // Extended mock data
-    const jobs: Job[] = mockJobs.slice(0, 6).map((job, index) => ({
-        ...job,
-        salary: ['$80k-$120k', '$100k-$150k', '$90k-$130k', '$70k-$100k', '$120k-$180k', '$85k-$115k'][index],
-        status: ['active', 'active', 'paused', 'active', 'draft', 'closed'][index] as Job['status'],
-        views: [245, 189, 156, 312, 45, 423][index],
-        createdAt: ['2 days ago', '1 week ago', '3 days ago', '5 days ago', 'Today', '2 weeks ago'][index]
-    }));
+    // Fetch jobs from API
+    useEffect(() => {
+        const fetchJobs = async () => {
+            try {
+                const data = await getMyJobs();
+                setJobs(data.map((job: JobData) => ({
+                    id: job._id || job.id || '',
+                    _id: job._id,
+                    title: job.title,
+                    company: job.company,
+                    location: job.location,
+                    type: job.type,
+                    salary: job.salary,
+                    status: job.status || 'active',
+                    applicationsCount: job.applicationsCount || 0,
+                    viewsCount: job.viewsCount || 0,
+                    createdAt: job.createdAt || new Date().toISOString(),
+                    skills: job.skills || []
+                })));
+            } catch (error) {
+                console.error('Error fetching jobs:', error);
+            }
+        };
+        fetchJobs();
+    }, []);
 
     const stats = {
         total: jobs.length,
         active: jobs.filter(j => j.status === 'active').length,
-        applications: jobs.reduce((sum, j) => sum + j.applicationsCount, 0),
-        views: jobs.reduce((sum, j) => sum + j.views, 0)
+        applications: jobs.reduce((sum, j) => sum + (j.applicationsCount || 0), 0),
+        views: jobs.reduce((sum, j) => sum + (j.viewsCount || 0), 0)
     };
+
 
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -210,8 +230,8 @@ const MyJobsPage: React.FC = () => {
 
                         <div className="job-card-meta">
                             <span><MapPin size={14} /> {job.location}</span>
-                            <span><DollarSign size={14} /> {job.salary}</span>
-                            <span><Clock size={14} /> {job.createdAt}</span>
+                            <span><IndianRupee size={14} /> ₹{job.salary?.min ? (job.salary.min / 100000).toFixed(1) : 0}L - ₹{job.salary?.max ? (job.salary.max / 100000).toFixed(1) : 0}L</span>
+                            <span><Clock size={14} /> {new Date(job.createdAt).toLocaleDateString()}</span>
                         </div>
 
                         <div className="job-card-skills">
@@ -231,12 +251,12 @@ const MyJobsPage: React.FC = () => {
                             </div>
                             <div className="job-stat">
                                 <Eye size={16} />
-                                <span className="stat-number">{job.views}</span>
+                                <span className="stat-number">{job.viewsCount}</span>
                                 <span className="stat-label">Views</span>
                             </div>
                             <div className="job-stat">
                                 <TrendingUp size={16} />
-                                <span className="stat-number">{Math.round(job.applicationsCount / job.views * 100)}%</span>
+                                <span className="stat-number">{job.viewsCount > 0 ? Math.round(job.applicationsCount / job.viewsCount * 100) : 0}%</span>
                                 <span className="stat-label">Apply Rate</span>
                             </div>
                         </div>

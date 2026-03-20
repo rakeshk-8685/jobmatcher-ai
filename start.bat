@@ -24,12 +24,15 @@ cd ..
 echo [3/3] Starting services...
 echo.
 echo Starting Backend (port 5000)...
-start "Backend" cmd /c "cd backend && npm run dev"
+start "Backend" cmd /k "cd backend && npm run dev"
 
 timeout /t 3 /nobreak >nul
 
 echo Starting Frontend (port 5173)...
 start "Frontend" cmd /c "npm run dev"
+
+echo Starting AI Service (port 8000)...
+start "AI Service" cmd /k "cd ai-service && if exist ..\.venv\Scripts\activate.bat (call ..\.venv\Scripts\activate.bat) && pip install -r requirements.txt && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
 
 echo.
 echo =========================================
