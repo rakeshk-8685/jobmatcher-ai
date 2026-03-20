@@ -15,6 +15,7 @@ import {
     updateProfile,
     type User as FirebaseUser
 } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -30,6 +31,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 // Google Sign In
@@ -82,5 +84,5 @@ export const onAuthChange = (callback: (user: FirebaseUser | null) => void) => {
     return onAuthStateChanged(auth, callback);
 };
 
-export { auth, type FirebaseUser };
+export { auth, db, type FirebaseUser };
 export default app;
